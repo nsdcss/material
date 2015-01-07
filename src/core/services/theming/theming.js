@@ -129,12 +129,18 @@ function ThemingProvider() {
     element.classList.add('md-color-palette-definition');
     document.body.appendChild(element);
 
-    var content = getComputedStyle(element).content;
-    // Get rid of leading and trailing quote
-    content = content ? content.substring(1,content.length-1) : '{}';
+    var backgroundImage = getComputedStyle(element).backgroundImage;
+    if (backgroundImage === 'none' || !backgroundImage) {
+      backgroundImage = '{}'
+    }
+
+    backgroundImage = backgroundImage
+      .replace(/^.*?\{/, '{') // get rid of everything before opening brace
+      .replace(/\}.\).*?$/, '}') // get rid of everything after closing brace and paren
+      .replace(/_/g, '"'); // we output underscores as placeholders for quotes
 
     // Remove backslashes that firefox gives
-    var parsed = JSON.parse(content.replace(/\\/g, ''));
+    var parsed = JSON.parse(decodeURI(backgroundImage));
     angular.extend(PALETTES, parsed);
     document.body.removeChild(element);
   }

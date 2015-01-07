@@ -82,6 +82,9 @@ function InkRippleService($window, $timeout) {
         hammertime = new Hammer(node),
         color = parseColor(element.attr('md-ink-ripple')) || parseColor($window.getComputedStyle(options.colorElement[0]).color || 'rgb(0, 0, 0)');
 
+    // expose onInput for ripple testing
+    scope._onInput = onInput;
+
     options.mousedown && hammertime.on('hammer.input', onInput);
 
     controller.createRipple = createRipple;
@@ -90,9 +93,7 @@ function InkRippleService($window, $timeout) {
       scope.$watch(isActiveExpr, function watchActive(newValue) {
         isActive = newValue;
         if (isActive && !ripples.length) {
-          $timeout(function () {
-            createRipple(0, 0);
-          }, 0, false);
+          $timeout(function () { createRipple(0, 0); }, 0, false);
         }
         angular.forEach(ripples, updateElement);
       });
@@ -315,7 +316,7 @@ function InkRippleService($window, $timeout) {
        */
       function getRippleContainer() {
         if (rippleContainer) return rippleContainer;
-        var container = rippleContainer = angular.element('<div class="md-ripple-container">');
+        var container = rippleContainer = angular.element('<div class="md-ripple-container"></div>');
         element.append(container);
         return container;
       }
@@ -335,9 +336,7 @@ function InkRippleService($window, $timeout) {
         isHeld = false;
         index = ripples.length - 1;
         ripple = ripples[index];
-        $timeout(function () {
-          updateElement(ripple);
-        }, 0, false);
+        $timeout(function () { updateElement(ripple); }, 0, false);
       }
 
       /**
@@ -350,7 +349,7 @@ function InkRippleService($window, $timeout) {
         var grandparent = parent && parent.parentNode;
         var ancestor = grandparent && grandparent.parentNode;
         return !node.hasAttribute('disabled') &&
-          !(parent && parent.hasAttribute('disabled')) &&
+          !(parent && parent.hasAttribute && parent.hasAttribute('disabled')) &&
           !(grandparent && grandparent.hasAttribute('disabled')) &&
           !(ancestor && ancestor.hasAttribute('disabled'));
       }
